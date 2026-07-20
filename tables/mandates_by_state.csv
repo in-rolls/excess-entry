@@ -1,0 +1,4 @@
+state,seats,mean_winner_share,median_winner_share,pct_winner_below_50,pct_winner_below_33,pct_split_decided
+Bihar,7973.0,0.3,0.28,92.4,66.66,92.4
+UP,49707.0,0.4,0.39,77.5,32.02,77.53
+Uttarakhand,18759.0,0.34,0.33,66.25,37.52,66.25

@@ -1,0 +1,13 @@
+state,year,reservation,seats,mean,p25,p50,p75,mean_eff_n,p50_eff_n
+Bihar,2016,Open,4548.0,12.12,8.0,11.0,15.0,5.92,5.38
+Bihar,2016,Women-reserved,3449.0,11.93,8.0,11.0,15.0,6.22,5.71
+Rajasthan,2020,Open,5763.0,6.26,3.0,6.0,8.0,,
+Rajasthan,2020,Women-reserved,5547.0,5.72,3.0,5.0,7.0,,
+UP,2021,Open,32998.0,7.5,5.0,7.0,9.0,3.75,3.44
+UP,2021,Women-reserved,16774.0,7.49,5.0,7.0,9.0,3.86,3.52
+Uttarakhand,2008,Open,3140.0,3.96,2.0,3.0,5.0,3.96,3.0
+Uttarakhand,2008,Women-reserved,3201.0,3.84,2.0,3.0,5.0,3.84,3.0
+Uttarakhand,2014,Open,3336.0,3.55,2.0,3.0,4.0,3.55,3.0
+Uttarakhand,2014,Women-reserved,3250.0,3.24,2.0,3.0,4.0,3.24,3.0
+Uttarakhand,2019,Open,2959.0,3.18,2.0,3.0,4.0,3.18,3.0
+Uttarakhand,2019,Women-reserved,2873.0,3.04,2.0,3.0,4.0,3.04,3.0

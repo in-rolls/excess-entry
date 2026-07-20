@@ -1,0 +1,5 @@
+state,seats,pct_same_name,pct_expected_by_chance,pct_namesake_diff_father,pct_3plus_same_name,max_cluster
+Bihar,7997,7.0,4.4,6.5,0.3,5
+Rajasthan,11310,5.5,0.7,5.4,0.2,3
+UP,49772,5.9,1.7,5.3,0.1,7
+Uttarakhand,18759,3.7,0.6,3.6,0.1,3
