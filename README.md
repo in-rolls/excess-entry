@@ -1,4 +1,4 @@
-# excess-entry
+# election_entry
 
 How many people contest a gram-panchayat head seat in India, and what that
 does to the vote. A descriptive study of candidate entry across four states,
