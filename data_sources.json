@@ -1,0 +1,14 @@
+{
+  "rajasthan": {
+    "provider": "local_elections_rajasthan",
+    "ref": "b543c4759519dd44682fbd278d81bdccaa152e99",
+    "path": "data/ContestingSarpanch.csv.gz",
+    "sha256": "d0360d37c63c5f0984fd25e5695af9c7958797ff435da8d1a0aefae9d7dcc889"
+  },
+  "up": {
+    "provider": "local_elections_up",
+    "ref": "9f051cd607b9a42aa3afc498e57737200ef22024",
+    "path": "data/raw/2021/gram_panchayat_pradhan_candidates.csv.gz",
+    "sha256": "8a7075bee6b59ebd0fc26c0630de2aadad1aec9edfdea34390661c754967c179"
+  }
+}

@@ -55,7 +55,8 @@ is not identified here.
 
 ## Data
 
-Clone the four source repos next to this one (or pass `--root`):
+UP and Rajasthan download automatically at the pinned commits below. Clone
+the Bihar and Uttarakhand source repos next to this one (or pass `--root`):
 
 - [`local_elections_rajasthan`](https://github.com/in-rolls/local_elections_rajasthan) — sarpanch 2020
 - [`local_elections_bihar`](https://github.com/in-rolls/local_elections_bihar) — mukhiya 2016
@@ -66,7 +67,7 @@ Clone the four source repos next to this one (or pass `--root`):
 
 ```bash
 pip install -r requirements.txt
-ROOT=..                                   # dir holding the four source repos
+ROOT=..
 python src/build.py        --root "$ROOT" --out tables/candidates.csv.gz
 python src/contestation.py --cand tables/candidates.csv.gz
 python src/mandates.py     --cand tables/candidates.csv.gz
@@ -111,3 +112,20 @@ figures/              generated PNGs
 
 Analysis code under MIT. Underlying data are the in-rolls local-election
 datasets; cite those repos and their sources.
+
+## Pinned election inputs
+
+`data_sources.json` records immutable upstream commits, relative paths and
+SHA-256 checksums. Pooch downloads the declared inputs once and verifies
+their checksums on reuse. All consumers share
+`$INDIA_DATA_HOME/<provider>/<commit>/<relative-path>`; `INDIA_DATA_HOME`
+defaults to `~/data`. An existing verified cache supports offline rebuilds.
+
+- UP v1.2: `9f051cd607b9a42aa3afc498e57737200ef22024`,
+  `data/raw/2021/gram_panchayat_pradhan_candidates.csv.gz`.
+- Rajasthan v1.1: `b543c4759519dd44682fbd278d81bdccaa152e99`,
+  `data/ContestingSarpanch.csv.gz`.
+
+Bihar and Uttarakhand still read the local repositories supplied by `--root`.
+
+Run the focused input checks with `python -m unittest discover -s tests`.

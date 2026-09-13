@@ -14,24 +14,38 @@ Output columns (one row per contesting candidate):
 Votes are NA for Rajasthan (the contesting file records no per-candidate
 votes; only winner and runner-up appear in WinnerSarpanch).
 
-Data (clone next to this repo, or pass --root):
-  github.com/in-rolls/local_elections_rajasthan
+UP and Rajasthan are downloaded from the commits in data_sources.json.
+Clone the Bihar and Uttarakhand sources next to this repo, or pass --root:
   github.com/in-rolls/local_elections_bihar
-  github.com/in-rolls/local_elections_up
   github.com/in-rolls/local_elections_uttarakhand
 """
+
 from __future__ import annotations
-import argparse, re, unicodedata, zipfile
+
+import argparse
+import re
+import unicodedata
 from pathlib import Path
-import numpy as np, pandas as pd
+
+import numpy as np
+import pandas as pd
+
+from sources import source_path
 
 WOMAN = re.compile(r"\(Woman\)|महिला|female|woman", re.I)
 CASTE_MAP = {
-    "अनारक्षित": "General", "general": "General", "unreserved": "General",
-    "अनुसूचित जाति": "SC", "sc": "SC",
-    "अनुसूचित जनजाति": "ST", "st": "ST",
-    "अन्य पिछड़ा वर्ग": "OBC", "अन्य पिछडा वर्ग": "OBC", "obc": "OBC",
-    "अति पिछड़ा वर्ग": "OBC", "पिछड़ा": "OBC",
+    "अनारक्षित": "General",
+    "general": "General",
+    "unreserved": "General",
+    "अनुसूचित जाति": "SC",
+    "sc": "SC",
+    "अनुसूचित जनजाति": "ST",
+    "st": "ST",
+    "अन्य पिछड़ा वर्ग": "OBC",
+    "अन्य पिछडा वर्ग": "OBC",
+    "obc": "OBC",
+    "अति पिछड़ा वर्ग": "OBC",
+    "पिछड़ा": "OBC",
 }
 
 
@@ -58,43 +72,91 @@ def _frame(df, seat_keys, name, father, res, votes, state, year, post):
     out["votes"] = pd.to_numeric(df[votes], errors="coerce") if votes else np.nan
     out["woman_seat"] = df[res].astype(str).str.contains(WOMAN).astype(int)
     out["caste"] = df[res].map(caste_of)
-    out["state"] = state; out["year"] = year; out["post"] = post
+    out["state"] = state
+    out["year"] = year
+    out["post"] = post
     return out[out.cand_name.str.len() > 0]
 
 
 def build(root: Path) -> pd.DataFrame:
     frames = []
 
-    r = pd.read_csv(root / "local_elections_rajasthan/data/ContestingSarpanch.csv.gz", low_memory=False)
+    r = pd.read_csv(source_path("rajasthan"), low_memory=False)
     r = r[r.ElectionType == "General Election"]
-    frames.append(_frame(r, ["District", "PanchayatSamiti", "NameOfGramPanchayat"],
-                         "NameOfContestingCandidate", "FatherHusbandOfContestingCandidate",
-                         "CategoryOfGramPanchayat", None, "Rajasthan", 2020, "sarpanch"))
+    frames.append(
+        _frame(
+            r,
+            ["District", "PanchayatSamiti", "NameOfGramPanchayat"],
+            "NameOfContestingCandidate",
+            "FatherHusbandOfContestingCandidate",
+            "CategoryOfGramPanchayat",
+            None,
+            "Rajasthan",
+            2020,
+            "sarpanch",
+        )
+    )
 
     b = pd.read_csv(root / "local_elections_bihar/data/mukhiya.csv", low_memory=False)
-    frames.append(_frame(b, ["district", "block", "panchayat"],
-                         "candidate_name", "father_husband_name",
-                         "reservation_status", "valid_vote", "Bihar", 2016, "mukhiya"))
+    frames.append(
+        _frame(
+            b,
+            ["district", "block", "panchayat"],
+            "candidate_name",
+            "father_husband_name",
+            "reservation_status",
+            "valid_vote",
+            "Bihar",
+            2016,
+            "mukhiya",
+        )
+    )
 
-    with zipfile.ZipFile(root / "local_elections_up/data/up_gram_panchayat_pradhan_2021.csv.zip") as zf:
-        with zf.open(zf.namelist()[0]) as f:
-            u = pd.read_csv(f, low_memory=False)
-    frames.append(_frame(u, ["zila", "block", "gram_panchayat"],
-                         "candidate_name_2021", "father_husband_name_2021",
-                         "reservation", "vote_percentage", "UP", 2021, "pradhan"))
+    u = pd.read_csv(source_path("up"), low_memory=False)
+    frames.append(
+        _frame(
+            u,
+            ["zila", "block", "gram_panchayat"],
+            "candidate_name_2021",
+            "father_husband_name_2021",
+            "reservation",
+            "vote_percentage",
+            "UP",
+            2021,
+            "pradhan",
+        )
+    )
 
-    uk = pd.read_csv(root / "local_elections_uttarakhand/data/uttarakhand-panchayat-elections.csv", low_memory=False)
+    uk = pd.read_csv(
+        root
+        / "local_elections_uttarakhand"
+        / "data"
+        / "uttarakhand-panchayat-elections.csv",
+        low_memory=False,
+    )
     uk = uk[uk["निर्वाचित पद"].astype(str).str.contains("प्रधान")].copy()
 
     def _n(s):
-        s = str(s).replace("\u200d", ""); s = re.sub(r"^\s*\d+\s*-\s*", "", s)
+        s = str(s).replace("\u200d", "")
+        s = re.sub(r"^\s*\d+\s*-\s*", "", s)
         return re.sub(r"\s+", "", re.sub(r"[\(（].*?[\)）]", "", s)).strip()
+
     for c in ["जनपद", "विकास खण्\u200dड", "ग्राम पंचायत"]:
         uk[c + "_k"] = uk[c].map(_n)
     for y, d in uk.groupby("Year"):
-        frames.append(_frame(d, ["जनपद_k", "विकास खण्\u200dड_k", "ग्राम पंचायत_k", "Year"],
-                             "अभ्\u200dयर्थी का नाम", "पिता/पति का नाम",
-                             "आरक्षण स्थिति", "प्राप्\u200dत मत", "Uttarakhand", int(y), "pradhan"))
+        frames.append(
+            _frame(
+                d,
+                ["जनपद_k", "विकास खण्\u200dड_k", "ग्राम पंचायत_k", "Year"],
+                "अभ्\u200dयर्थी का नाम",
+                "पिता/पति का नाम",
+                "आरक्षण स्थिति",
+                "प्राप्\u200dत मत",
+                "Uttarakhand",
+                int(y),
+                "pradhan",
+            )
+        )
 
     out = pd.concat(frames, ignore_index=True)
     out["seat_id"] = out.state + "::" + out.seat_id
@@ -109,5 +171,8 @@ if __name__ == "__main__":
     df = build(Path(a.root))
     Path(a.out).parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(a.out, index=False, compression="gzip")
-    print(f"built {len(df):,} candidates across "
-          f"{df.seat_id.nunique():,} GP-head seats, {df.state.nunique()} states -> {a.out}")
+    print(
+        f"built {len(df):,} candidates across "
+        f"{df.seat_id.nunique():,} GP-head seats, "
+        f"{df.state.nunique()} states -> {a.out}"
+    )
